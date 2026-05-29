@@ -5,24 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Custom Home Build Estimate</title>
     <!--
-      RBA BRAND FONTS
-      Headings: Proxima Nova   |   Body: Helvetica Neue LT Pro   (both Adobe Fonts)
+      RBA BRAND FONTS (Adobe Fonts / Typekit web project)
+      Headings: Proxima Nova            -> font-family "proxima-nova"
+      Body:     Helvetica Neue LT Pro   -> font-family "helvetica-neue-lt-pro"
 
-      To load the EXACT brand fonts, paste your Adobe Fonts (Typekit) web-project
-      stylesheet link below, and add this site's domains (the *.vercel.app URL +
-      any custom domain) to that project's allowed domains in the Adobe dashboard:
-
-          <link rel="stylesheet" href="https://use.typekit.net/XXXXXXX.css" />
-
-      Until that kit is added, the UI falls back to Montserrat (close to Proxima
-      Nova) and the system Helvetica/Arial stack (close to Helvetica Neue).
+      IMPORTANT: for these to render, the deployment's domain(s) must be listed in
+      this Adobe Fonts web project's allowed domains (fonts.adobe.com -> the
+      project -> Settings -> Domains). Add the production *.vercel.app URL and any
+      custom domain. Any domain not listed silently falls back to Helvetica/Arial.
     -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://use.typekit.net" crossorigin />
+    <link rel="stylesheet" href="https://use.typekit.net/nsv4wzr.css" />
   </head>
   <body>
     <div id="root"></div>

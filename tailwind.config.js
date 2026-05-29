@@ -23,7 +23,7 @@ export default {
         // RBA brand type: body = Helvetica Neue LT Pro, headings = Proxima Nova.
         // Real fonts load via Adobe Fonts (see index.html); fallbacks approximate.
         sans: ['helvetica-neue-lt-pro', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-        display: ['proxima-nova', 'Montserrat', '"Helvetica Neue"', 'sans-serif'],
+        display: ['proxima-nova', '"Helvetica Neue"', 'Arial', 'sans-serif'],
       },
       borderRadius: {
         // Echoes the brand's tight 4px radius (cards a touch softer at 8px).
