@@ -26,7 +26,7 @@ export default function Step3Finish({ selections, update }) {
               <span
                 className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${
                   selections.finish === opt.key
-                    ? 'border-accent bg-accent text-base'
+                    ? 'border-accent bg-accent text-on-accent'
                     : 'border-line text-transparent'
                 }`}
               >

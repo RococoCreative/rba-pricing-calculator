@@ -14,17 +14,20 @@ export default {
         'surface-2': 'rgb(var(--color-surface-2) / <alpha-value>)', // raised card
         accent: 'rgb(var(--color-accent) / <alpha-value>)', // single accent color
         'accent-soft': 'rgb(var(--color-accent-soft) / <alpha-value>)',
+        'on-accent': 'rgb(var(--color-on-accent) / <alpha-value>)', // text/icons on accent fills
         ink: 'rgb(var(--color-ink) / <alpha-value>)', // primary text
         'ink-muted': 'rgb(var(--color-ink-muted) / <alpha-value>)', // secondary text
         line: 'rgb(var(--color-line) / <alpha-value>)', // borders / hairlines
       },
       fontFamily: {
-        // Confident, premium type. Falls back to system stack.
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        // RBA brand type: body = Helvetica Neue LT Pro, headings = Proxima Nova.
+        // Real fonts load via Adobe Fonts (see index.html); fallbacks approximate.
+        sans: ['helvetica-neue-lt-pro', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        display: ['proxima-nova', 'Montserrat', '"Helvetica Neue"', 'sans-serif'],
       },
       borderRadius: {
-        xl2: '1.25rem',
+        // Echoes the brand's tight 4px radius (cards a touch softer at 8px).
+        xl2: '0.5rem',
       },
       transitionTimingFunction: {
         premium: 'cubic-bezier(0.22, 1, 0.36, 1)',

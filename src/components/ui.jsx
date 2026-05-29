@@ -26,7 +26,7 @@ export function StepHeading({ title, subtitle }) {
 export function PrimaryButton({ children, className = '', ...props }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold tracking-wide text-base transition hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded bg-accent px-7 py-3.5 text-sm font-semibold tracking-wide text-on-accent transition hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
       {...props}
     >
       {children}
@@ -38,7 +38,7 @@ export function PrimaryButton({ children, className = '', ...props }) {
 export function GhostButton({ children, className = '', ...props }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3.5 text-sm font-semibold tracking-wide text-ink transition hover:border-accent hover:text-accent ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded border border-line px-6 py-3.5 text-sm font-semibold tracking-wide text-ink transition hover:border-accent hover:text-accent ${className}`}
       {...props}
     >
       {children}

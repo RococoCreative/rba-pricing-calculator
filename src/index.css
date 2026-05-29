@@ -8,14 +8,16 @@
  *  `rgb(var(--token) / <alpha>)` color definitions in tailwind.config.js).
  * ========================================================================== */
 :root {
-  --color-base: 15 17 21;        /* near-black page background */
-  --color-surface: 24 27 33;     /* card background */
-  --color-surface-2: 33 37 45;   /* raised / hover card */
-  --color-accent: 198 167 110;   /* single accent — warm brass/gold */
-  --color-accent-soft: 214 190 145;
-  --color-ink: 244 244 245;      /* primary text */
-  --color-ink-muted: 161 165 174;/* secondary text */
-  --color-line: 51 56 66;        /* hairline borders */
+  /* RBA brand palette — dark mode. Hex shown for reference (from Webflow vars). */
+  --color-base: 27 27 27;        /* #1b1b1b — brand dark, page background */
+  --color-surface: 38 38 36;     /* #262624 — card background */
+  --color-surface-2: 51 50 47;   /* #33322f — raised / hover card */
+  --color-accent: 28 110 244;    /* #1c6ef4 — brand CTA blue */
+  --color-accent-soft: 90 150 247;/* #5a96f7 — lighter blue (hover) */
+  --color-on-accent: 255 252 247;/* #fffcf7 — text/icons on accent fills */
+  --color-ink: 255 252 247;      /* #fffcf7 — brand warm white, primary text */
+  --color-ink-muted: 166 165 161;/* #a6a5a1 — brand neutral, secondary text */
+  --color-line: 58 57 54;        /* #3a3936 — hairline borders */
 }
 
 html,
@@ -28,7 +30,8 @@ body {
   margin: 0;
   background-color: rgb(var(--color-base));
   color: rgb(var(--color-ink));
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'helvetica-neue-lt-pro', 'Helvetica Neue', Arial, ui-sans-serif,
+    system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

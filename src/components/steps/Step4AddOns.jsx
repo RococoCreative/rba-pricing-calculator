@@ -30,7 +30,7 @@ export default function Step4AddOns({ selections, update }) {
                 <span
                   className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border text-[10px] ${
                     isOn
-                      ? 'border-accent bg-accent text-base'
+                      ? 'border-accent bg-accent text-on-accent'
                       : 'border-line text-transparent'
                   }`}
                 >
