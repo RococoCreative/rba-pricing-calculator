@@ -38,8 +38,8 @@ export default function Step4AddOns({ selections, update }) {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-semibold text-ink">{opt.label}</span>
-                    <span className="flex-shrink-0 text-sm font-semibold text-accent">
+                    <span className="font-bold text-ink">{opt.label}</span>
+                    <span className="flex-shrink-0 text-sm font-bold text-accent-ink">
                       +{formatCurrency(opt.price)}
                     </span>
                   </div>

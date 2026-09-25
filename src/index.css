@@ -6,15 +6,20 @@
  *  BRAND TOKENS  —  swap these RGB triples to re-theme the whole calculator.
  *  Values are space-separated RGB channels (consumed by Tailwind's
  *  `rgb(var(--token) / <alpha>)` color definitions in tailwind.config.js).
+ *
+ *  Contrast rule (WCAG AA): the brand blue (`accent`) is too dark for small
+ *  text on these dark surfaces. Use `text-accent` only for large display
+ *  figures (24px+ bold) and `text-accent-ink` for labels, prices and links.
  * ========================================================================== */
 :root {
   /* RBA brand palette — dark mode. Hex shown for reference (from Webflow vars). */
   --color-base: 27 27 27;        /* #1b1b1b — brand dark, page background */
   --color-surface: 38 38 36;     /* #262624 — card background */
   --color-surface-2: 51 50 47;   /* #33322f — raised / hover card */
-  --color-accent: 28 110 244;    /* #1c6ef4 — brand CTA blue */
-  --color-accent-soft: 90 150 247;/* #5a96f7 — lighter blue (hover) */
-  --color-on-accent: 255 252 247;/* #fffcf7 — text/icons on accent fills */
+  --color-accent: 28 110 244;    /* #1c6ef4 — brand CTA blue: fills, borders, large text */
+  --color-accent-strong: 21 88 200;/* #1558c8 — darker blue, button hover (6.4:1 with white) */
+  --color-accent-ink: 111 163 248;/* #6fa3f8 — lighter blue for SMALL text on dark (≥5:1) */
+  --color-on-accent: 255 255 255;/* #ffffff — text/icons on accent fills (4.6:1) */
   --color-ink: 255 252 247;      /* #fffcf7 — brand warm white, primary text */
   --color-ink-muted: 166 165 161;/* #a6a5a1 — brand neutral, secondary text */
   --color-line: 58 57 54;        /* #3a3936 — hairline borders */
@@ -30,8 +35,7 @@ body {
   margin: 0;
   background-color: rgb(var(--color-base));
   color: rgb(var(--color-ink));
-  font-family: 'helvetica-neue-lt-pro', 'Helvetica Neue', Arial, ui-sans-serif,
-    system-ui, sans-serif;
+  font-family: theme('fontFamily.sans');
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

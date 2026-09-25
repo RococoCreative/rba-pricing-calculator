@@ -5,10 +5,10 @@ export default function Stepper({ steps, current }) {
   return (
     <div className="mb-10">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-muted">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-muted">
           Step {current + 1} of {steps.length}
         </p>
-        <p className="text-xs font-medium text-accent">{steps[current]}</p>
+        <p className="text-xs font-medium text-accent-ink">{steps[current]}</p>
       </div>
       <div className="mt-3 flex gap-1.5">
         {steps.map((label, i) => (

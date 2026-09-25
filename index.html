@@ -11,10 +11,15 @@
 
       IMPORTANT: for these to render, the deployment's domain(s) must be listed in
       this Adobe Fonts web project's allowed domains (fonts.adobe.com -> the
-      project -> Settings -> Domains). Add the production *.vercel.app URL and any
-      custom domain. Any domain not listed silently falls back to Helvetica/Arial.
+      project -> Settings -> Domains). See README "Brand fonts" for the list.
+      Any domain not listed silently falls back to Helvetica/Arial.
     -->
+    <!-- The kit CSS is a no-CORS request, the font files are CORS requests,
+         so each needs its own warmed connection. p.typekit.net is the kit's
+         chained @import. -->
+    <link rel="preconnect" href="https://use.typekit.net" />
     <link rel="preconnect" href="https://use.typekit.net" crossorigin />
+    <link rel="preconnect" href="https://p.typekit.net" />
     <link rel="stylesheet" href="https://use.typekit.net/nsv4wzr.css" />
   </head>
   <body>

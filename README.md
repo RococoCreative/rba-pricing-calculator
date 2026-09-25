@@ -82,7 +82,8 @@ variable. The frontend is destination-agnostic — it only knows this URL.
    `VITE_LEAD_WEBHOOK_URL`.
 
    _(Optional)_ `VITE_DISCOVERY_CALL_URL` — link for the "Schedule a Discovery
-   Call" button on the results page (e.g. a Calendly URL). Defaults to no-op.
+   Call" button on the results page (e.g. a Calendly URL). If it isn't set, the
+   button is hidden.
 
 ### Lead payload shape
 
@@ -118,8 +119,12 @@ never blocked) and a soft notice is shown.
 
 1. Push this repo to GitHub and import it into Vercel.
 2. Framework preset: **Vite**. Build command `npm run build`, output `dist`.
-3. Add the `VITE_LEAD_WEBHOOK_URL` environment variable (see above).
-4. Deploy.
+3. Add the `VITE_LEAD_WEBHOOK_URL` environment variable (see above), plus
+   `VITE_DISCOVERY_CALL_URL` if you want the discovery-call button.
+4. Add the deployment's domain to the Adobe Fonts project (see
+   [Brand fonts](#8-brand-fonts-adobe-fonts)). Skip this and the site renders in
+   Helvetica/Arial with no error.
+5. Deploy.
 
 ---
 
@@ -140,6 +145,9 @@ The build uses a relative `base`, so it works from any path.
 
 **Script/div mount:** host the built `dist/` and include the generated JS/CSS
 from `dist/index.html` into a page that contains a `<div id="root"></div>`.
+Also copy the Adobe Fonts `<link>` tags from `index.html` into the host page's
+`<head>`, and add the host site's domain to the Adobe Fonts project. Without
+both, the calculator renders in Helvetica/Arial.
 
 For most builder websites (Webflow, WordPress, Squarespace) the iframe embed is
 recommended.
@@ -172,3 +180,51 @@ src/
 Brand colors are CSS variables in [`src/index.css`](src/index.css)
 (`--color-base`, `--color-accent`, etc.) and mapped to Tailwind tokens in
 `tailwind.config.js`. Swap the RGB values to re-skin the whole calculator.
+
+**Contrast rules (WCAG AA).** The brand blue is too dark for small text on the
+dark background, so it is split into three tokens:
+
+| Token | Hex | Use for |
+|---|---|---|
+| `accent` | `#1c6ef4` | Button fills, borders, progress bar, large figures (24px+ bold) |
+| `accent-strong` | `#1558c8` | Button hover fill |
+| `accent-ink` | `#6fa3f8` | Small accent text: eyebrows, prices, labels, hover text |
+
+Button labels use `on-accent` (pure white, 4.6:1 on the blue).
+
+**Radius.** Controls (buttons, inputs, selects) use `rounded` (4px). Cards and
+panels use `rounded-xl2` (8px).
+
+**PDF.** The downloadable estimate is a separate print document with its own
+colors, set at the top of
+[`src/lib/generateEstimatePdf.js`](src/lib/generateEstimatePdf.js). Update it
+whenever the brand palette changes.
+
+---
+
+## 8. Brand fonts (Adobe Fonts)
+
+Fonts load from Adobe Fonts kit `nsv4wzr` (linked in `index.html`):
+
+- **Headings:** Proxima Nova (`font-display`), weights 400 and 700
+- **Body:** Helvetica Neue LT Pro (`font-sans`), weights 300, 400, 500, 700
+
+The kit has no 600 weight, so the code uses `font-medium` / `font-bold`, never
+`font-semibold`. If you add weights to the kit, update the comment in
+`tailwind.config.js`.
+
+**Allowed domains.** Adobe only serves the fonts to domains listed in the web
+project (fonts.adobe.com → Web Projects → this project → Domains). Add:
+
+- the production Vercel URL (e.g. `rba-pricing-calculator.vercel.app`)
+- any custom domain the calculator runs on
+- the domain of any site that embeds it with the script/div mount (iframes only
+  need the calculator's own domain)
+- `localhost` if you want brand type during local development
+
+Vercel preview URLs change per deploy and won't be listed, so previews show
+Helvetica/Arial. Judge typography on production.
+
+**Recommended kit setting:** set the project's font-display to **swap** in the
+Adobe Fonts project settings. The default (`auto`) hides text until the fonts
+arrive, which can mean a few blank seconds on slow mobile connections.

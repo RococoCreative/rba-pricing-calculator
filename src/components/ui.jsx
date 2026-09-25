@@ -4,7 +4,7 @@
 /** Eyebrow label above a step heading. */
 export function Eyebrow({ children }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+    <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-ink">
       {children}
     </p>
   );
@@ -14,7 +14,7 @@ export function Eyebrow({ children }) {
 export function StepHeading({ title, subtitle }) {
   return (
     <div className="mb-8">
-      <h2 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+      <h2 className="font-display text-3xl font-bold leading-tight text-ink sm:text-4xl">
         {title}
       </h2>
       {subtitle && <p className="mt-2 max-w-xl text-ink-muted">{subtitle}</p>}
@@ -26,7 +26,7 @@ export function StepHeading({ title, subtitle }) {
 export function PrimaryButton({ children, className = '', ...props }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded bg-accent px-7 py-3.5 text-sm font-semibold tracking-wide text-on-accent transition hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded bg-accent px-7 py-3.5 text-sm font-bold tracking-wide text-on-accent transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
       {...props}
     >
       {children}
@@ -38,7 +38,7 @@ export function PrimaryButton({ children, className = '', ...props }) {
 export function GhostButton({ children, className = '', ...props }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded border border-line px-6 py-3.5 text-sm font-semibold tracking-wide text-ink transition hover:border-accent hover:text-accent ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded border border-line px-6 py-3.5 text-sm font-bold tracking-wide text-ink transition hover:border-accent hover:text-accent-ink ${className}`}
       {...props}
     >
       {children}
@@ -83,7 +83,7 @@ export function Label({ children, htmlFor }) {
 export function TextInput({ invalid, className = '', ...props }) {
   return (
     <input
-      className={`w-full rounded-lg border bg-surface px-4 py-3 text-ink placeholder-ink-muted/60 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent ${
+      className={`w-full rounded border bg-surface px-4 py-3 text-ink placeholder-ink-muted/60 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent ${
         invalid ? 'border-red-500/70' : 'border-line'
       } ${className}`}
       {...props}

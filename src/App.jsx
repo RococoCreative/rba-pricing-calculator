@@ -8,7 +8,7 @@ import Step4AddOns from './components/steps/Step4AddOns.jsx';
 import Step5Preview from './components/steps/Step5Preview.jsx';
 import Step6Gate from './components/steps/Step6Gate.jsx';
 import Step7Results from './components/steps/Step7Results.jsx';
-import { calculateEstimate, formatRange } from './lib/calculateEstimate.js';
+import { calculateEstimate, formatMaskedRange } from './lib/calculateEstimate.js';
 import { buildLeadPayload, postLead } from './lib/buildLeadPayload.js';
 import { squareFootageRange } from './config/pricingConfig.js';
 
@@ -54,6 +54,12 @@ export default function App() {
   // ---- LIVE estimate: recomputed on every selection change ----
   const estimate = useMemo(() => calculateEstimate(selections), [selections]);
 
+  // Blurred displays get a decoy figure so the real range stays behind the gate.
+  const maskedRange = useMemo(
+    () => formatMaskedRange(estimate.low, estimate.high),
+    [estimate]
+  );
+
   const isLast = step === STEP_LABELS.length - 1;
   const next = () => setStep((s) => Math.min(s + 1, STEP_LABELS.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
@@ -87,7 +93,7 @@ export default function App() {
       case 3:
         return <Step4AddOns selections={selections} update={updateSelections} />;
       case 4:
-        return <Step5Preview estimate={estimate} />;
+        return <Step5Preview maskedRange={maskedRange} />;
       case 5:
         return (
           <Step6Gate
@@ -120,7 +126,7 @@ export default function App() {
       <div className="w-full max-w-2xl">
         {/* Brand header */}
         <header className="mb-8 text-center">
-          <p className="font-display text-lg font-semibold tracking-wide text-ink">
+          <p className="font-display text-lg font-bold tracking-wide text-ink">
             Custom Home Build
           </p>
           <p className="text-sm text-ink-muted">Instant Estimate Calculator</p>
@@ -151,8 +157,11 @@ export default function App() {
               <p className="text-xs uppercase tracking-widest text-ink-muted">
                 Live Estimate
               </p>
-              <p className="estimate-blur mt-1 font-display text-2xl font-semibold text-accent">
-                {formatRange(estimate.low, estimate.high)}
+              <p
+                className="estimate-blur mt-1 font-display text-2xl font-bold text-accent"
+                aria-hidden="true"
+              >
+                {maskedRange}
               </p>
             </div>
           )}

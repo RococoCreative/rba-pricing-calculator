@@ -21,7 +21,7 @@ export default function Step1Basics({ selections, update }) {
       <div className="mb-10">
         <div className="mb-3 flex items-baseline justify-between">
           <Label>Square Footage</Label>
-          <span className="font-display text-2xl font-semibold text-accent">
+          <span className="font-display text-2xl font-bold text-accent">
             {selections.squareFootage.toLocaleString()} sqft
           </span>
         </div>
@@ -48,7 +48,7 @@ export default function Step1Basics({ selections, update }) {
             id="location"
             value={selections.location}
             onChange={(e) => update({ location: e.target.value })}
-            className="w-full appearance-none rounded-lg border border-line bg-surface px-4 py-3 text-ink outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full appearance-none rounded border border-line bg-surface px-4 py-3 text-ink outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
           >
             {locationOptions.map((opt) => (
               <option key={opt.key} value={opt.key}>
@@ -73,7 +73,7 @@ export default function Step1Basics({ selections, update }) {
               onClick={() => update({ stories: opt.key })}
               className="text-center"
             >
-              <span className="block text-sm font-semibold text-ink">
+              <span className="block text-sm font-bold text-ink">
                 {opt.label}
               </span>
             </SelectCard>

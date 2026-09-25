@@ -1,8 +1,9 @@
 import { Eyebrow, StepHeading } from '../ui.jsx';
-import { formatRange } from '../../lib/calculateEstimate.js';
 
-/* Step 5 — Estimate Preview: the live range shown BLURRED with an unlock CTA. */
-export default function Step5Preview({ estimate }) {
+/* Step 5 — Estimate Preview: a decoy range shown BLURRED with an unlock CTA.
+ * `maskedRange` has the real figure's shape but random digits (see
+ * formatMaskedRange), so the actual estimate never reaches the DOM here. */
+export default function Step5Preview({ maskedRange }) {
   return (
     <div className="animate-fadeInUp text-center">
       <Eyebrow>Your Estimate</Eyebrow>
@@ -10,12 +11,12 @@ export default function Step5Preview({ estimate }) {
 
       <div className="relative mx-auto max-w-lg overflow-hidden rounded-xl2 border border-line bg-surface p-10">
         {/* Blurred figure — credible but unreadable until the gate is passed. */}
-        <div className="estimate-blur">
+        <div className="estimate-blur" aria-hidden="true">
           <p className="text-sm font-medium uppercase tracking-widest text-ink-muted">
             Estimated Cost Range
           </p>
-          <p className="mt-3 font-display text-4xl font-semibold text-accent sm:text-5xl">
-            {formatRange(estimate.low, estimate.high)}
+          <p className="mt-3 font-display text-4xl font-bold text-accent sm:text-5xl">
+            {maskedRange}
           </p>
         </div>
 

@@ -20,7 +20,7 @@ export default function Step3Finish({ selections, update }) {
             className="flex h-full flex-col"
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="font-display text-xl font-semibold text-ink">
+              <span className="font-display text-xl font-bold text-ink">
                 {opt.label}
               </span>
               <span

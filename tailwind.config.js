@@ -13,7 +13,8 @@ export default {
         surface: 'rgb(var(--color-surface) / <alpha-value>)', // card background
         'surface-2': 'rgb(var(--color-surface-2) / <alpha-value>)', // raised card
         accent: 'rgb(var(--color-accent) / <alpha-value>)', // single accent color
-        'accent-soft': 'rgb(var(--color-accent-soft) / <alpha-value>)',
+        'accent-strong': 'rgb(var(--color-accent-strong) / <alpha-value>)', // hover fill
+        'accent-ink': 'rgb(var(--color-accent-ink) / <alpha-value>)', // small accent text on dark
         'on-accent': 'rgb(var(--color-on-accent) / <alpha-value>)', // text/icons on accent fills
         ink: 'rgb(var(--color-ink) / <alpha-value>)', // primary text
         'ink-muted': 'rgb(var(--color-ink-muted) / <alpha-value>)', // secondary text
@@ -22,11 +23,16 @@ export default {
       fontFamily: {
         // RBA brand type: body = Helvetica Neue LT Pro, headings = Proxima Nova.
         // Real fonts load via Adobe Fonts (see index.html); fallbacks approximate.
+        // Kit weights: proxima-nova 400/700, helvetica-neue-lt-pro 300/400/500/700.
+        // There is no 600 in the kit, so use font-medium or font-bold, never
+        // font-semibold. This is also the single source of truth for body type
+        // (src/index.css reads it via theme()).
         sans: ['helvetica-neue-lt-pro', '"Helvetica Neue"', 'Arial', 'sans-serif'],
         display: ['proxima-nova', '"Helvetica Neue"', 'Arial', 'sans-serif'],
       },
       borderRadius: {
-        // Echoes the brand's tight 4px radius (cards a touch softer at 8px).
+        // Brand radius: controls (buttons, inputs, selects) use `rounded` (4px),
+        // cards and panels use `rounded-xl2` (8px).
         xl2: '0.5rem',
       },
       transitionTimingFunction: {

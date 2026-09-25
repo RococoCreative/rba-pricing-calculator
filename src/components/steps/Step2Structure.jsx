@@ -19,7 +19,7 @@ export default function Step2Structure({ selections, update }) {
             id="foundation"
             value={selections.foundation}
             onChange={(e) => update({ foundation: e.target.value })}
-            className="w-full appearance-none rounded-lg border border-line bg-surface px-4 py-3 text-ink outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full appearance-none rounded border border-line bg-surface px-4 py-3 text-ink outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
           >
             {foundationOptions.map((opt) => (
               <option key={opt.key} value={opt.key}>
@@ -44,7 +44,7 @@ export default function Step2Structure({ selections, update }) {
               onClick={() => update({ garage: opt.key })}
               className="text-center"
             >
-              <span className="block text-sm font-semibold text-ink">
+              <span className="block text-sm font-bold text-ink">
                 {opt.label}
               </span>
             </SelectCard>

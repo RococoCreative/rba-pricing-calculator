@@ -104,3 +104,16 @@ export function formatCurrency(value) {
 export function formatRange(low, high) {
   return `${formatCurrency(low)} – ${formatCurrency(high)}`;
 }
+
+/**
+ * Decoy version of formatRange for the BLURRED (locked) estimate. Keeps the
+ * same shape and digit count, but every digit is random, so the real figure
+ * can't be read by un-blurring the DOM before the lead gate is passed.
+ * Call it once per estimate change (e.g. inside useMemo) so the blur only
+ * shifts when the user changes an input.
+ */
+export function formatMaskedRange(low, high) {
+  return formatRange(low, high).replace(/\d/g, () =>
+    String(Math.floor(Math.random() * 10))
+  );
+}
