@@ -4,9 +4,11 @@ An embeddable, multi-step pricing calculator and **lead-generation tool** for a
 luxury custom-home builder. Visitors tweak project inputs, watch a live
 (blurred) estimate update, then enter their contact details to unlock the full
 estimated cost range. Submitting the form POSTs the lead to a single
-configurable webhook (a Make scenario that routes into Mailchimp).
+serverless relay that forwards it to a GoHighLevel workflow, which creates the
+contact and emails the estimate.
 
-Built with **Vite + React + Tailwind CSS**. No backend required.
+Built with **Vite + React + Tailwind CSS**, plus one Vercel function
+(`api/lead.js`) for lead delivery.
 
 ---
 
@@ -64,30 +66,36 @@ and is verified by `npm run calc:test`.
 
 ---
 
-## 3. Setting the webhook (lead destination)
+## 3. Lead destination (GoHighLevel)
 
-The lead form POSTs JSON to the URL in the `VITE_LEAD_WEBHOOK_URL` environment
-variable. The frontend is destination-agnostic — it only knows this URL.
+On submit, the calculator POSTs the lead to **`/api/lead`**, a Vercel function
+in [`api/lead.js`](api/lead.js). The function forwards it server-side to the
+GoHighLevel workflow URL in **`GHL_WEBHOOK_URL`**. GHL creates or updates the
+contact and sends the estimate email.
 
-1. In **Make**, create a scenario starting with a **Custom Webhook** trigger and
-   copy its URL.
-2. Point that scenario at **Mailchimp** (add/update subscriber, etc.).
-3. Set the env var:
+Why the relay: the request stays same-origin (no browser CORS failures) and
+the GHL webhook URL never ships in the public JavaScript.
 
-   **Local:** copy `.env.example` to `.env` and set the value:
-   ```bash
-   VITE_LEAD_WEBHOOK_URL=https://hook.eu1.make.com/your-webhook-id
-   ```
-   **Vercel:** Project → Settings → Environment Variables → add
-   `VITE_LEAD_WEBHOOK_URL`.
+| Env var | Where | Required | Purpose |
+|---|---|---|---|
+| `GHL_WEBHOOK_URL` | Vercel (server) | Yes | GHL workflow "Inbound Webhook" trigger URL |
+| `VITE_DISCOVERY_CALL_URL` | Vercel (build) | No | Link for "Schedule a Discovery Call"; button hidden if unset |
+| `VITE_LEAD_WEBHOOK_URL` | Vercel (build) | No | Bypass the relay and POST straight to another webhook (e.g. Make) |
 
-   _(Optional)_ `VITE_DISCOVERY_CALL_URL` — link for the "Schedule a Discovery
-   Call" button on the results page (e.g. a Calendly URL). If it isn't set, the
-   button is hidden.
+`npm run dev` does not run `/api/lead`, so submissions in local dev show the
+soft "couldn't save" notice. Test lead delivery on a Vercel deployment.
+
+### GHL workflow (summary)
+
+1. **Trigger:** Inbound Webhook. Copy its URL into `GHL_WEBHOOK_URL`.
+2. **Action:** Create/Update Contact, mapping the fields below.
+3. **Action:** Send Email to the contact, using the estimate fields.
+4. **Settings:** allow re-entry, then Publish.
+
+The Inbound Webhook is a GHL premium trigger: each sub-account gets 100 free
+executions, then usage is billed to the account wallet.
 
 ### Lead payload shape
-
-On submit the app POSTs this JSON:
 
 ```json
 {
@@ -100,18 +108,18 @@ On submit the app POSTs this JSON:
   "finishTier": "Ultra-Luxury",
   "addOns": "Outdoor Living, Full Pool, Home Automation",
   "estimateLow": 3259825,
-  "estimateHigh": 4234025
+  "estimateHigh": 4234025,
+  "estimateRange": "$3,259,825 – $4,234,025"
 }
 ```
 
-> **Important:** `addOns` is a **comma-separated string** (not an array), and
-> `location` / `finishTier` are sent as **human-readable labels** (not internal
-> keys). The Make scenario expects these formats. All of this mapping lives in
-> one place — [`src/lib/buildLeadPayload.js`](src/lib/buildLeadPayload.js) —
-> so it's easy to adjust if the CRM field format changes.
+> `addOns` is a **comma-separated string** (not an array), `location` /
+> `finishTier` are **human-readable labels**, and `estimateRange` is
+> pre-formatted for use in emails. All of this mapping lives in
+> [`src/lib/buildLeadPayload.js`](src/lib/buildLeadPayload.js).
 
-If the webhook fails, the user still sees their estimate (the experience is
-never blocked) and a soft notice is shown.
+If the relay or GHL fails, the user still sees their estimate and a soft notice
+is shown. Failures are logged in Vercel → Project → Logs.
 
 ---
 
@@ -119,7 +127,7 @@ never blocked) and a soft notice is shown.
 
 1. Push this repo to GitHub and import it into Vercel.
 2. Framework preset: **Vite**. Build command `npm run build`, output `dist`.
-3. Add the `VITE_LEAD_WEBHOOK_URL` environment variable (see above), plus
+3. Add the `GHL_WEBHOOK_URL` environment variable (see above), plus
    `VITE_DISCOVERY_CALL_URL` if you want the discovery-call button.
 4. Add the deployment's domain to the Adobe Fonts project (see
    [Brand fonts](#8-brand-fonts-adobe-fonts)). Skip this and the site renders in
@@ -157,6 +165,8 @@ recommended.
 ## 6. Project structure
 
 ```
+api/
+  lead.js                   ← Vercel function: relays leads to GoHighLevel
 src/
   config/
     pricingConfig.js        ← ⭐ all prices + labels (edit this)
