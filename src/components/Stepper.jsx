@@ -1,22 +1,22 @@
-/* Progress indicator shown at the top of the calculator.
- * Renders one segment per step and fills completed/active segments. */
-
-export default function Stepper({ steps, current }) {
+/* Progress indicator: one segment per question plus the final details step. */
+export default function Stepper({ current, total, label }) {
   return (
-    <div className="mb-10">
+    <div className="mb-8">
       <div className="flex items-center justify-between">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-muted">
-          Step {current + 1} of {steps.length}
+          {current < total - 1 ? `Question ${current + 1} of ${total - 1}` : 'Last step'}
         </p>
-        <p className="text-xs font-medium text-accent-ink">{steps[current]}</p>
+        <p className="text-xs font-medium text-accent-ink">{label}</p>
       </div>
-      <div className="mt-3 flex gap-1.5">
-        {steps.map((label, i) => (
-          <div
-            key={label}
-            className="h-1 flex-1 overflow-hidden rounded-full bg-line"
-            aria-current={i === current ? 'step' : undefined}
-          >
+      <div
+        className="mt-3 flex gap-1.5"
+        role="progressbar"
+        aria-valuemin={1}
+        aria-valuemax={total}
+        aria-valuenow={current + 1}
+      >
+        {Array.from({ length: total }, (_, i) => (
+          <div key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-line">
             <div
               className="h-full rounded-full bg-accent transition-all duration-500 ease-premium"
               style={{ width: i <= current ? '100%' : '0%' }}

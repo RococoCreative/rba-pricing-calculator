@@ -1,4 +1,5 @@
-import { Eyebrow, PrimaryButton, GhostButton } from '../ui.jsx';
+import { Eyebrow, PrimaryButton, GhostButton, assetUrl } from '../ui.jsx';
+import { styles } from '../../config/pricingConfig.js';
 import { formatRange } from '../../lib/calculateEstimate.js';
 import { buildBreakdown } from '../../lib/buildBreakdown.js';
 import { generateEstimatePdf } from '../../lib/generateEstimatePdf.js';
@@ -10,11 +11,12 @@ const DISCOVERY_CALL_URL = import.meta.env.VITE_DISCOVERY_CALL_URL || '';
 const DISCLAIMER =
   'This estimate is based on current regional market averages and your selected specifications. Final pricing requires a full scope review and site assessment.';
 
-/* Step 7 — Results: unlocked range, line-item breakdown, CTAs, disclaimer.
+/* Results: unlocked range over the chosen style's photo, summary, CTAs.
  * `leadError` is a soft warning shown when the webhook POST failed but the
  * estimate was still revealed (UX is never blocked by a webhook hiccup). */
-export default function Step7Results({ selections, contact, estimate, leadError }) {
+export default function Results({ selections, contact, estimate, leadError }) {
   const breakdown = buildBreakdown(selections);
+  const styleImage = styles[selections.style]?.image;
 
   const handleDownloadPdf = () => {
     try {
@@ -39,20 +41,32 @@ export default function Step7Results({ selections, contact, estimate, leadError 
         </p>
       )}
 
-      {/* Prominent unlocked range */}
-      <div className="mx-auto mt-6 max-w-lg rounded-xl2 border border-accent/30 bg-surface p-10">
-        <p className="text-sm font-medium uppercase tracking-widest text-ink-muted">
-          Estimated Cost Range
-        </p>
-        <p className="mt-3 font-display text-4xl font-bold text-accent sm:text-5xl">
-          {formatRange(estimate.low, estimate.high)}
-        </p>
+      {/* Prominent unlocked range, over the style they picked */}
+      <div className="relative mx-auto mt-6 max-w-lg overflow-hidden rounded-xl2 border border-accent/30 bg-surface">
+        {styleImage && (
+          <>
+            <img
+              src={assetUrl(styleImage)}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-base/75" />
+          </>
+        )}
+        <div className="relative p-8 sm:p-10">
+          <p className="text-sm font-medium uppercase tracking-widest text-ink">
+            Estimated Cost Range
+          </p>
+          <p className="mt-3 font-display text-4xl font-bold text-white sm:text-5xl">
+            {formatRange(estimate.low, estimate.high)}
+          </p>
+        </div>
       </div>
 
       {/* Line-item breakdown */}
       <div className="mx-auto mt-8 max-w-lg rounded-xl2 border border-line bg-surface p-6 text-left">
         <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-ink-muted">
-          Your Selections
+          Your Vision
         </h3>
         <dl className="divide-y divide-line">
           {breakdown.map((row) => (

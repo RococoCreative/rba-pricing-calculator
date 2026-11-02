@@ -1,9 +1,10 @@
 # Custom Home Build — Pricing Calculator
 
-An embeddable, multi-step pricing calculator and **lead-generation tool** for a
-luxury custom-home builder. Visitors tweak project inputs, watch a live
-(blurred) estimate update, then enter their contact details to unlock the full
-estimated cost range. Submitting the form POSTs the lead to a single
+An embeddable, photo-driven pricing calculator and **lead-generation tool** for
+a luxury custom-home builder. Visitors answer 7 quick, mostly one-tap questions
+(style, size, finish, must-haves, location, lot, timeline) on cards that show
+real RBA projects, then enter their contact details to unlock their estimated
+cost range. Submitting the form POSTs the lead to a single
 serverless relay that forwards it to a GoHighLevel workflow, which creates the
 contact and emails the estimate.
 
@@ -26,36 +27,63 @@ Requires Node 18+ (works on Node 22).
 
 ---
 
-## 2. Editing pricing  ⭐ (no coding needed)
+## 2. Editing the calculator  ⭐ (no coding needed)
 
-**All prices live in one file:** [`src/config/pricingConfig.js`](src/config/pricingConfig.js)
+Two files control everything a visitor sees:
 
-Open it and change the numbers and labels. You do **not** need to touch any
-other file. The file is heavily commented and explains the units. In short:
+| File | What it controls |
+|---|---|
+| [`src/config/pricingConfig.js`](src/config/pricingConfig.js) | Every price, multiplier, label, and photo |
+| [`src/config/questions.js`](src/config/questions.js) | Question order and wording, plus the lot and timeline answers |
+
+### The flow
+
+| # | Question | Type | Affects price |
+|---|---|---|---|
+| 1 | Which home feels like yours? (style) | Photo cards, one tap | Yes (×N) |
+| 2 | How much room do you need? (size band) | Size cards, one tap | Yes (sqft) |
+| 3 | How should it feel inside? (finish) | Photo cards, one tap | Yes (×N) |
+| 4 | What would make it unforgettable? (must-haves) | Photo cards, pick any or skip | Yes ($) |
+| 5 | Where are you building? | Cards, one tap | Yes (×N) |
+| 6 | Where are you with land? | Cards, one tap | No (sales qualifier) |
+| 7 | When would you like to break ground? | Cards, one tap | No (sales qualifier) |
+
+One-tap questions advance automatically. Then comes the lead form (with the
+blurred estimate) and the results page.
+
+### Pricing sections
 
 | Section | What it controls | Unit |
 |---|---|---|
 | `baseCostPerSqft` | Starting build cost | $/sqft |
-| `locationMultipliers` | Regional price adjustment | ×N |
-| `foundationAdders` | Flat cost by foundation type | $ |
-| `storiesMultiplier` | Adjustment by number of storeys | ×N |
-| `garageAdders` | Flat cost by garage type | $ |
+| `standardAllowance` | Typical basement + 2-car garage, included in every estimate | $ |
+| `styles` | Home style cards (label, photo, multiplier) | ×N |
+| `sizeTiers` | Size bands and the representative sqft used in the math | sqft |
 | `finishMultiplier` | Luxury / Ultra-Luxury / Bespoke | ×N |
-| `addOns` | Optional features and their price | $ |
+| `addOns` | Must-have cards and their price (prices are never shown to visitors) | $ |
+| `locationMultipliers` | Regional price adjustment | ×N |
 | `rangeSpread` | Width of the ± range (0.13 = ±13%) | fraction |
-| `squareFootageRange` | Slider min/max/step/default | sqft |
+| `estimateDefaults` | Answers assumed for the live estimate before questions are answered | keys |
 
-**Editing rules:** only change numbers and the text inside `"quotes"`. Keep the
-internal *key* (the word before the colon, e.g. `slab:`) the same — change the
-`label` text freely, since that is what the user and your CRM actually see.
+**Editing rules:** only change numbers and the text inside `'quotes'`. Keep the
+internal *key* (the word before the colon, e.g. `modern:`) the same. Change the
+`label` text freely, since that is what visitors and your CRM see.
+
+### Photos
+
+Every card photo is a real RBA project, exported from the RBA Webflow site and
+stored in [`public/images/`](public/images). To swap one, drop a landscape
+image (about 900px wide, `.webp` or `.jpg`) into that folder and update its
+`image` path in `pricingConfig.js`. The welcome photo is
+`public/images/hero.webp`.
 
 ### The formula
 
 ```
-subtotal = (baseCostPerSqft × squareFootage)
-         + foundationAdder + garageAdder + sum(selected add-ons)
+subtotal = (baseCostPerSqft × size.sqft)
+         + standardAllowance + sum(selected must-haves)
 
-figure   = subtotal × storiesMultiplier × finishMultiplier × locationMultiplier
+figure   = subtotal × style × finish × location
 
 low  = figure × (1 − rangeSpread)
 high = figure × (1 + rangeSpread)
@@ -88,7 +116,10 @@ soft "couldn't save" notice. Test lead delivery on a Vercel deployment.
 ### GHL workflow (summary)
 
 1. **Trigger:** Inbound Webhook. Copy its URL into `GHL_WEBHOOK_URL`.
-2. **Action:** Create/Update Contact, mapping the fields below.
+2. **Action:** Create/Update Contact, mapping the payload fields below to
+   contact fields (create custom fields for `homeStyle`, `homeSize`,
+   `finishTier`, `addOns`, `location`, `lotStatus`, `timeline`, and
+   `estimateRange`).
 3. **Action:** Send Email to the contact, using the estimate fields.
 4. **Settings:** allow re-entry, then Publish.
 
@@ -103,20 +134,25 @@ executions, then usage is billed to the account wallet.
   "lastName": "Doe",
   "email": "jane@example.com",
   "phone": "(555) 123-4567",
-  "squareFootage": 6000,
-  "location": "GTA Core",
+  "homeStyle": "Cottage & Lakeside",
+  "homeSize": "Estate (5,000–7,500 sq ft)",
+  "squareFootage": 6250,
   "finishTier": "Ultra-Luxury",
-  "addOns": "Outdoor Living, Full Pool, Home Automation",
-  "estimateLow": 3259825,
-  "estimateHigh": 4234025,
-  "estimateRange": "$3,259,825 – $4,234,025"
+  "addOns": "Outdoor Living, Pool & Cabana, Boathouse & Dock",
+  "location": "Cottage Country",
+  "lotStatus": "Knockdown & rebuild",
+  "timeline": "Within 6 months",
+  "estimateLow": 3191834,
+  "estimateHigh": 4145716,
+  "estimateRange": "$3,191,834 – $4,145,716"
 }
 ```
 
-> `addOns` is a **comma-separated string** (not an array), `location` /
-> `finishTier` are **human-readable labels**, and `estimateRange` is
-> pre-formatted for use in emails. All of this mapping lives in
-> [`src/lib/buildLeadPayload.js`](src/lib/buildLeadPayload.js).
+> `addOns` is a **comma-separated string** (not an array), every answer is sent
+> as its **human-readable label**, and `estimateRange` is pre-formatted for use
+> in emails. `lotStatus` and `timeline` are built for lead scoring (for
+> example, tag "Within 6 months" + "I own a lot" as a hot lead). All of this
+> mapping lives in [`src/lib/buildLeadPayload.js`](src/lib/buildLeadPayload.js).
 
 If the relay or GHL fails, the user still sees their estimate and a soft notice
 is shown. Failures are logged in Vercel → Project → Logs.
@@ -167,9 +203,11 @@ recommended.
 ```
 api/
   lead.js                   ← Vercel function: relays leads to GoHighLevel
+public/images/              ← RBA project photos used on the cards
 src/
   config/
-    pricingConfig.js        ← ⭐ all prices + labels (edit this)
+    pricingConfig.js        ← ⭐ prices, labels, photos (edit this)
+    questions.js            ← ⭐ question order + wording (edit this)
   lib/
     calculateEstimate.js    ← pricing formula
     calculateEstimate.test.mjs
@@ -177,10 +215,11 @@ src/
     buildBreakdown.js       ← readable selection summary
     generateEstimatePdf.js  ← print-to-PDF of the estimate
   components/
+    QuestionStep.jsx        ← renders any question from questions.js
     Stepper.jsx
-    ui.jsx                  ← shared primitives
+    ui.jsx                  ← buttons, photo/size/text option cards
     steps/
-      Step1Basics.jsx … Step7Results.jsx
+      Welcome.jsx  LeadGate.jsx  Results.jsx
   App.jsx                   ← flow + state orchestration
   main.jsx
 ```

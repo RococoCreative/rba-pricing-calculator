@@ -6,9 +6,11 @@ export function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-/* Step 6 — Lead Gate: first name, last name, email (required); phone (optional).
- * Validates before allowing reveal. `submitting` / `error` reflect the POST. */
-export default function Step6Gate({ contact, update, onReveal, submitting }) {
+/* Lead Gate: the blurred estimate plus the contact form that unlocks it.
+ * First name, last name, email (required); phone (optional).
+ * `maskedRange` is a decoy figure (see formatMaskedRange), so the real range
+ * never reaches the DOM before the form is submitted. */
+export default function LeadGate({ contact, update, onReveal, submitting, maskedRange }) {
   const [touched, setTouched] = useState({});
 
   const emailValid = isValidEmail(contact.email);
@@ -26,11 +28,31 @@ export default function Step6Gate({ contact, update, onReveal, submitting }) {
 
   return (
     <div className="animate-fadeInUp">
-      <Eyebrow>Almost There</Eyebrow>
+      <Eyebrow>Your Estimate Is Ready</Eyebrow>
       <StepHeading
-        title="Reveal your estimate"
-        subtitle="Tell us where to send your detailed estimate. No spam — just your numbers."
+        title="Where should we send it?"
+        subtitle="Unlock your estimated range and a copy for your inbox. No spam, just your numbers."
       />
+
+      {/* Locked estimate */}
+      <div className="relative mb-8 overflow-hidden rounded-xl2 border border-line bg-surface px-6 py-7 text-center">
+        <div className="estimate-blur" aria-hidden="true">
+          <p className="text-xs font-medium uppercase tracking-widest text-ink-muted">
+            Estimated Cost Range
+          </p>
+          <p className="mt-2 font-display text-3xl font-bold text-accent sm:text-4xl">
+            {maskedRange}
+          </p>
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-base/30">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-accent/50 bg-base/70 text-accent-ink">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+          </span>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <div className="grid gap-5 sm:grid-cols-2">

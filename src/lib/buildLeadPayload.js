@@ -12,17 +12,14 @@
  *      The downstream CRM mapping expects:
  *        • `addOns`     as a comma-separated STRING ("Outdoor Living, Pool"),
  *                       NOT an array. Sending an array breaks that field.
- *        • `location`   as the readable LABEL ("GTA Core"), not the key.
- *        • `finishTier` as the readable LABEL ("Ultra-Luxury"), not the key.
+ *        • Every answer (`homeStyle`, `homeSize`, `finishTier`, `location`,
+ *          `lotStatus`, `timeline`) as its readable LABEL, not the key.
  *      If the CRM field format ever changes, adjust it HERE only.
  * ========================================================================== */
 
-import {
-  locationMultipliers,
-  finishMultiplier,
-  addOns,
-} from '../config/pricingConfig.js';
+import { sizeTiers } from '../config/pricingConfig.js';
 import { formatRange } from './calculateEstimate.js';
+import { selectionLabels } from './buildBreakdown.js';
 
 /**
  * Build the exact JSON body to POST to the webhook from the user's selections,
@@ -30,32 +27,27 @@ import { formatRange } from './calculateEstimate.js';
  * labels the CRM expects.
  *
  * @param {Object} args
- * @param {Object} args.contact   - { firstName, lastName, email, phone }
- * @param {Object} args.selections- { squareFootage, location, finish, selectedAddOns }
- * @param {Object} args.estimate  - { low, high }
+ * @param {Object} args.contact    - { firstName, lastName, email, phone }
+ * @param {Object} args.selections - { style, size, finish, addOns, location, lot, timeline }
+ * @param {Object} args.estimate   - { low, high }
  * @returns {Object} payload ready to JSON.stringify
  */
 export function buildLeadPayload({ contact, selections, estimate }) {
-  // Map internal keys -> readable labels (one source of truth: pricingConfig).
-  const locationLabel = locationMultipliers[selections.location]?.label ?? '';
-  const finishLabel = finishMultiplier[selections.finish]?.label ?? '';
-
-  // Convert selected add-on KEYS into a single comma-separated STRING of
-  // their readable labels, e.g. ["outdoorLiving","poolFull"] -> "Outdoor Living, Full Pool".
-  const addOnsString = (selections.selectedAddOns ?? [])
-    .map((key) => addOns[key]?.label)
-    .filter(Boolean)
-    .join(', ');
+  const labels = selectionLabels(selections);
 
   return {
     firstName: contact.firstName.trim(),
     lastName: contact.lastName.trim(),
     email: contact.email.trim(),
     phone: (contact.phone ?? '').trim(), // optional
-    squareFootage: selections.squareFootage, // number, for context
-    location: locationLabel, // readable label, e.g. "GTA Core"
-    finishTier: finishLabel, // readable label, e.g. "Ultra-Luxury"
-    addOns: addOnsString, // comma-joined STRING (never an array)
+    homeStyle: labels.style, // e.g. "Modern"
+    homeSize: labels.size, // e.g. "Spacious (3,500–5,000 sq ft)"
+    squareFootage: sizeTiers[selections.size]?.sqft ?? null, // number used in the math
+    finishTier: labels.finish, // readable label, e.g. "Ultra-Luxury"
+    addOns: labels.addOns, // comma-joined STRING (never an array)
+    location: labels.location, // readable label, e.g. "GTA Core"
+    lotStatus: labels.lot, // e.g. "Knockdown & rebuild"
+    timeline: labels.timeline, // e.g. "Within 6 months"
     estimateLow: estimate.low, // number
     estimateHigh: estimate.high, // number
     estimateRange: formatRange(estimate.low, estimate.high), // "$1,977,388 – $2,568,332", ready for emails

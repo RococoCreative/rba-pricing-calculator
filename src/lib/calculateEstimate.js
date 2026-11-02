@@ -5,73 +5,68 @@
  *  this file never needs editing to change prices.
  *
  *  FORMULA:
- *    subtotal = (baseCostPerSqft × squareFootage)
- *             + foundationAdder
- *             + garageAdder
- *             + sum(selected add-on prices)
+ *    subtotal = (baseCostPerSqft × size.sqft)
+ *             + standardAllowance
+ *             + sum(selected must-have prices)
  *
- *    figure   = subtotal × storiesMultiplier × finishMultiplier × locationMultiplier
+ *    figure   = subtotal × style × finish × location
  *
  *    low  = figure × (1 − rangeSpread)
  *    high = figure × (1 + rangeSpread)
+ *
+ *  Unanswered questions (null) fall back to `estimateDefaults`, so the live
+ *  estimate always has a figure. Unknown keys fall back to ×1 / $0.
  * ========================================================================== */
 
 import {
   baseCostPerSqft,
-  locationMultipliers,
-  foundationAdders,
-  storiesMultiplier,
-  garageAdders,
+  standardAllowance,
+  styles,
+  sizeTiers,
   finishMultiplier,
-  addOns,
+  addOns as addOnPrices,
+  locationMultipliers,
   rangeSpread,
+  estimateDefaults,
 } from '../config/pricingConfig.js';
 
 /**
  * Calculate the estimate from a set of user selections.
  *
  * @param {Object} selections
- * @param {number} selections.squareFootage  - chosen square footage (sqft)
- * @param {string} selections.location        - location key (e.g. "gtaCore")
- * @param {string} selections.stories         - stories key (e.g. "two")
- * @param {string} selections.foundation      - foundation key (e.g. "slab")
- * @param {string} selections.garage          - garage key (e.g. "attached2")
- * @param {string} selections.finish          - finish key (e.g. "ultraLuxury")
- * @param {string[]} selections.selectedAddOns - array of add-on keys
+ * @param {string|null} selections.style    - style key (e.g. "modern")
+ * @param {string|null} selections.size     - size tier key (e.g. "spacious")
+ * @param {string|null} selections.finish   - finish key (e.g. "ultraLuxury")
+ * @param {string[]}    selections.addOns   - array of must-have keys
+ * @param {string|null} selections.location - location key (e.g. "gtaCore")
  * @returns {{ low:number, high:number, figure:number, subtotal:number }}
  */
 export function calculateEstimate({
-  squareFootage,
-  location,
-  stories,
-  foundation,
-  garage,
-  finish,
-  selectedAddOns = [],
-}) {
-  // --- Look up each selected value from the config (default safely to 0/1) ---
-  const foundationAdder = foundationAdders[foundation]?.adder ?? 0; // $
-  const garageAdder = garageAdders[garage]?.adder ?? 0; // $
+  style = null,
+  size = null,
+  finish = null,
+  addOns = [],
+  location = null,
+} = {}) {
+  const pick = (value, field) => value ?? estimateDefaults[field];
 
-  // Sum the flat price of every add-on the user toggled on.
-  const addOnsTotal = selectedAddOns.reduce(
-    (sum, key) => sum + (addOns[key]?.price ?? 0),
+  // --- Look up each selected value (unknown keys default safely) ---
+  const sqft =
+    sizeTiers[pick(size, 'size')]?.sqft ?? sizeTiers[estimateDefaults.size].sqft; // sqft
+  const addOnsTotal = addOns.reduce(
+    (sum, key) => sum + (addOnPrices[key]?.price ?? 0),
     0
   ); // $
 
   // --- Step 1: additive subtotal (everything in flat dollars) ---
-  const subtotal =
-    baseCostPerSqft * squareFootage + // base build cost
-    foundationAdder + // foundation flat adder
-    garageAdder + // garage flat adder
-    addOnsTotal; // selected add-ons
+  const subtotal = baseCostPerSqft * sqft + standardAllowance + addOnsTotal;
 
-  // --- Step 2: apply the three multipliers in sequence ---
-  const storiesMult = storiesMultiplier[stories]?.multiplier ?? 1; // ×N
-  const finishMult = finishMultiplier[finish]?.multiplier ?? 1; // ×N
-  const locationMult = locationMultipliers[location]?.multiplier ?? 1; // ×N
+  // --- Step 2: apply the multipliers ---
+  const styleMult = styles[pick(style, 'style')]?.multiplier ?? 1; // ×N
+  const finishMult = finishMultiplier[pick(finish, 'finish')]?.multiplier ?? 1; // ×N
+  const locationMult = locationMultipliers[pick(location, 'location')]?.multiplier ?? 1; // ×N
 
-  const figure = subtotal * storiesMult * finishMult * locationMult;
+  const figure = subtotal * styleMult * finishMult * locationMult;
 
   // --- Step 3: spread into a ±rangeSpread range ---
   // Deliberately NOT rounded to clean numbers — slightly irregular figures
